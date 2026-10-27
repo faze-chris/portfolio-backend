@@ -21,6 +21,36 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// CREATE / POST
+app.MapPost("/api/projects", (PortfolioDb db, [FromBody] CreateProjectRequest request) =>
+{
+    var newProject = new Project
+    {
+        Title = request.Title,
+        Description = request.Description,
+        Category = request.Category,
+        GitHubUrl = request.GitHubUrl,
+        Date = request.Date
+    };
+
+    db.Projects.Add(newProject);
+    db.SaveChanges();
+
+    var response = new ProjectResponse
+    {
+        Id = newProject.Id,
+        Title = newProject.Title,
+        Description = newProject.Description,
+        Category = newProject.Category,
+        GitHubUrl = newProject.GitHubUrl,
+        Date = newProject.Date
+    };
+
+    return Results.Created($"/api/projects/{response.Id}", response);
+})
+.WithName("CreateProject")
+.WithTags("Projects");
+
 // READ / GET
 app.MapGet("/api/projects", (PortfolioDb db) =>
 {
@@ -37,36 +67,6 @@ app.MapGet("/api/projects", (PortfolioDb db) =>
     return Results.Ok(projects);
 })
 .WithName("GetProjects")
-.WithTags("Projects");
-
-// CREATE / POST
-app.MapPost("/api/projects", (PortfolioDb db, [FromBody] CreateProjectRequest request) =>
-{
-    var newProject = new Project
-    {
-        Title = request.Title,
-        Description = request.Description,
-        Category = request.Category,
-        GitHubUrl = request.GitHubUrl,
-        Date = request.Date
-    };
-
-    db.Projects.Add(newProject);
-    db.SaveChanges();
-    
-    var response = new ProjectResponse
-    {
-        Id = newProject.Id,
-        Title = newProject.Title,
-        Description = newProject.Description,
-        Category = newProject.Category,
-        GitHubUrl = newProject.GitHubUrl,
-        Date = newProject.Date
-    };
-
-    return Results.Created($"/api/projects/{response.Id}", response);
-})
-.WithName("CreateProject")
 .WithTags("Projects");
 
 // UPDATE / PUT
