@@ -1,10 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddDbContext<PortfolioDb>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("PortfolioDb")));
 
 var app = builder.Build();
 
@@ -17,50 +21,83 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("/api/projects", () =>
+// READ / GET
+app.MapGet("/api/projects", (PortfolioDb db) =>
 {
-    var fakeProjects = new List<ProjectResponse>
+    var projects = db.Projects.Select(p => new ProjectResponse
     {
-        new ProjectResponse 
-        { 
-            Id = 1, 
-            Titel = "Noughts and Crosses", 
-            Beschrijving = "Boter, kaas en eieren game", 
-            Categorie = "Game",
-            Datum = new DateTime(2026, 9, 15) // Vul hier een datum in
-        },
-        new ProjectResponse 
-        { 
-            Id = 2, 
-            Titel = "Weather App", 
-            Beschrijving = "Een weer-applicatie gekoppeld aan een API", 
-            Categorie = "App",
-            Datum = new DateTime(2026, 9, 30) // Vul hier een datum in
-        }
-    };
-    return Results.Ok(fakeProjects);
+        Id = p.Id,
+        Title = p.Title,
+        Description = p.Description,
+        Category = p.Category,
+        GitHubUrl = p.GitHubUrl,
+        Date = p.Date
+    }).ToList();
+
+    return Results.Ok(projects);
 })
 .WithName("GetProjects")
 .WithTags("Projects");
 
-
-app.MapPost("/api/projects", ([FromBody] CreateProjectRequest request) =>
+// CREATE / POST
+app.MapPost("/api/projects", (PortfolioDb db, [FromBody] CreateProjectRequest request) =>
 {
-    
-    var createdProject = new ProjectResponse 
-    { 
-        Id = 3, 
-        Titel = request.Titel,
-        Beschrijving = request.Beschrijving,
-        Categorie = request.Categorie,
+    var newProject = new Project
+    {
+        Title = request.Title,
+        Description = request.Description,
+        Category = request.Category,
         GitHubUrl = request.GitHubUrl,
-        Datum = request.Datum
+        Date = request.Date
     };
+
+    db.Projects.Add(newProject);
+    db.SaveChanges();
     
-    return Results.Created($"/api/projects/{createdProject.Id}", createdProject);
+    var response = new ProjectResponse
+    {
+        Id = newProject.Id,
+        Title = newProject.Title,
+        Description = newProject.Description,
+        Category = newProject.Category,
+        GitHubUrl = newProject.GitHubUrl,
+        Date = newProject.Date
+    };
+
+    return Results.Created($"/api/projects/{response.Id}", response);
 })
 .WithName("CreateProject")
 .WithTags("Projects");
 
+// UPDATE / PUT
+app.MapPut("/api/projects/{id}", (PortfolioDb db, int id, [FromBody] CreateProjectRequest request) =>
+{
+    var project = db.Projects.Find(id);
+    if (project == null) return Results.NotFound();
+
+    project.Title = request.Title;
+    project.Description = request.Description;
+    project.Category = request.Category;
+    project.GitHubUrl = request.GitHubUrl;
+    project.Date = request.Date;
+
+    db.SaveChanges();
+    return Results.NoContent();
+})
+.WithName("UpdateProject")
+.WithTags("Projects");
+
+// DELETE
+app.MapDelete("/api/projects/{id}", (PortfolioDb db, int id) =>
+{
+    var project = db.Projects.Find(id);
+    if (project == null) return Results.NotFound();
+
+    db.Projects.Remove(project);
+    db.SaveChanges();
+    return Results.NoContent();
+})
+.WithName("DeleteProject")
+.WithTags("Projects");
 
 app.Run();
