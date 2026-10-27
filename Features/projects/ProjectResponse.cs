@@ -6,4 +6,5 @@ public class ProjectResponse
     public string Category { get; set; } = string.Empty;
     public string GitHubUrl { get; set; } = string.Empty;
     public DateTime Date { get; set; }
+    public string ImageUrl { get; set; } = string.Empty;
 }

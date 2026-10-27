@@ -21,6 +21,38 @@ namespace portfolio_backend.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Blogpost", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("LinkedInUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Blogposts");
+                });
+
             modelBuilder.Entity("Project", b =>
                 {
                     b.Property<int>("Id")
@@ -41,6 +73,10 @@ namespace portfolio_backend.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("GitHubUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasColumnType("text");
 

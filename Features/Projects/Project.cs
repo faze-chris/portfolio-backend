@@ -16,4 +16,6 @@ public class Project
     public string GitHubUrl { get; set; } = string.Empty;
 
     public DateTime Date { get; set; }
+
+    public string ImageUrl { get; set; } = string.Empty;
 }
