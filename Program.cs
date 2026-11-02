@@ -50,8 +50,7 @@ app.MapPost("/api/projects", (PortfolioDb db, [FromBody] CreateProjectRequest re
         ImageUrl = newProject.ImageUrl
     };
 
-    return Results.Created($"/api/projects/{response.Id}", response);
-})
+    return Results.Created("/api/projects/" + response.Id, response);})
 .WithName("CreateProject")
 .WithTags("Projects");
 
@@ -132,7 +131,7 @@ app.MapPost("/api/blogposts", (PortfolioDb db, [FromBody] CreateBlogpostRequest 
         ImageUrl = newBlogpost.ImageUrl,
         LinkedInUrl = newBlogpost.LinkedInUrl
     };
-    return Results.Created($"/api/blogposts/{response.Id}", response);
+    return Results.Created("/api/blogposts/" + response.Id, response);
 })
 .WithName("CreateBlogpost")
 .WithTags("Blogposts");
