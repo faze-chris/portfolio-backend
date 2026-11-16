@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/portfolio-backend/">
+    <Project Path="portfolio-backend/Portfolio.Tests/Portfolio.Tests.csproj" />
+  </Folder>
+  <Project Path="portfolio-backend/portfolio-backend.csproj" />
+</Solution>
