@@ -15,7 +15,7 @@ builder.Services.AddIdentityApiEndpoints<IdentityUser>()
 
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorizationBuilder()
-    .AddPolicy("CanEdit", policy => policy.RequireRole("Editor", "Admin"));
+    .AddPolicy("CanEdit", policy => policy.RequireRole( "Admin"));
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -24,6 +24,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
     app.MapOpenApi();
 }
+await DbInitializer.SeedAsync(app.Services);
 
 app.UseHttpsRedirection();
 
