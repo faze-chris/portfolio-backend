@@ -14,25 +14,25 @@ public class CreateProjectTests : IClassFixture<WebApplicationFactory<Program>>
 {
     private readonly WebApplicationFactory<Program> _factory;
     private const string ApiRoute = "/api/projects";
-    private const string AuthSchemeName = "Test";
+    private const string AuthSchemeName = "MockAuth";
     private const string RoleName = "Admin";
-    private const string TestUserName = "TestAdmin";
+    private const string MockUserName = "FakeAdmin";
 
     public CreateProjectTests(WebApplicationFactory<Program> factory)
     {
         _factory = factory;
     }
 
-    //dit is voor het testen van de login api zo we kunnen testen of een ingelogde Admin een project kan aanmaken
-    private class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
+     // Dit is een mock login handler voor het testen van de create API 
+    private class MockAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {
-        public TestAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> options, ILoggerFactory logger, UrlEncoder encoder)
+        public MockAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> options, ILoggerFactory logger, UrlEncoder encoder)
             : base(options, logger, encoder) { }
 
         protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
             // fake user met de rol admin
-            var claims = new[] { new Claim(ClaimTypes.Name, TestUserName), new Claim(ClaimTypes.Role, RoleName) };
+            var claims = new[] { new Claim(ClaimTypes.Name, MockUserName), new Claim(ClaimTypes.Role, RoleName) };
             var ticket = new AuthenticationTicket(new ClaimsPrincipal(new ClaimsIdentity(claims, AuthSchemeName)), AuthSchemeName);
 
             return Task.FromResult(AuthenticateResult.Success(ticket));
@@ -40,7 +40,7 @@ public class CreateProjectTests : IClassFixture<WebApplicationFactory<Program>>
     }
 
     [Fact]
-    // Test of een user zonder rol een project kan maken
+    // Test of een user zonder rol een project kan aanmaken
     public async Task createProject_WithoutAuth_ReturnsUnauthorized()
     {
         // Arrange: Zet een standaard user en testdata klaar
@@ -64,7 +64,7 @@ public class CreateProjectTests : IClassFixture<WebApplicationFactory<Program>>
     {
         // Arrange: maak een admin user aan met testdata
         var client = _factory.WithWebHostBuilder(b => b.ConfigureServices(s =>
-            s.AddAuthentication(AuthSchemeName).AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(AuthSchemeName, _ => { })
+            s.AddAuthentication(AuthSchemeName).AddScheme<AuthenticationSchemeOptions, MockAuthHandler>(AuthSchemeName, _ => { })
         )).CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
 
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(AuthSchemeName);

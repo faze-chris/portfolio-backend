@@ -13,7 +13,7 @@ public class ReadProjectTests : IClassFixture<WebApplicationFactory<Program>>
     }
 
     [Fact]
-    // Test of we alle projecten succesvol kunnen ophalen zonder in te loggen
+    // Test of een user zonder rol een project kan lezen
     public async Task readProjects_ReturnsSuccess()
     {
         // Arrange: Zet een standaard user en testdata klaar
