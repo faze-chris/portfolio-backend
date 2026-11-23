@@ -7,7 +7,7 @@ public static class BlogpostEndpoints
         // map group for blogposts with path /api/blogposts
         var group = app.MapGroup("/api/blogposts").WithTags("Blogposts");
 
-        // CREATE / POST 
+        // CREATE / POST Beveiligd
         group.MapPost("/", (PortfolioDb db, [FromBody] CreateBlogpostRequest request) =>
         {
             var newBlogpost = new Blogpost 
@@ -32,9 +32,11 @@ public static class BlogpostEndpoints
                 LinkedInUrl = newBlogpost.LinkedInUrl
             };
             return Results.Created($"/api/blogposts/{response.Id}", response);
-        }).WithName("CreateBlogpost");
+        })
+        .WithName("CreateBlogpost")
+        .RequireAuthorization("CanEdit");
 
-        // READ / GET 
+        // READ / GET open
         group.MapGet("/", (PortfolioDb db) =>
         {
             var blogposts = db.Blogposts.Select(b => new BlogpostResponse
@@ -49,7 +51,7 @@ public static class BlogpostEndpoints
             return Results.Ok(blogposts);
         }).WithName("GetBlogposts");
 
-        // UPDATE / PUT 
+        // UPDATE / PUT Beveiligd
         group.MapPut("/{id}", (PortfolioDb db, int id, [FromBody] CreateBlogpostRequest request) =>
         {
             var blogpost = db.Blogposts.Find(id);
@@ -63,9 +65,11 @@ public static class BlogpostEndpoints
 
             db.SaveChanges();
             return Results.NoContent();
-        }).WithName("UpdateBlogpost");
+        })
+        .WithName("UpdateBlogpost")
+        .RequireAuthorization("CanEdit");
 
-        // DELETE 
+        // DELETE Beveiligd
         group.MapDelete("/{id}", (PortfolioDb db, int id) =>
         {
             var blogpost = db.Blogposts.Find(id);
@@ -74,6 +78,8 @@ public static class BlogpostEndpoints
             db.Blogposts.Remove(blogpost);
             db.SaveChanges();
             return Results.NoContent();
-        }).WithName("DeleteBlogpost");
+        })
+        .WithName("DeleteBlogpost")
+        .RequireAuthorization("CanEdit");
     }
 }
