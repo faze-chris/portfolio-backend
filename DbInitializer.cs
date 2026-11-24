@@ -8,7 +8,7 @@ public static class DbInitializer
         using var scope = services.CreateScope();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-
+        
         string[] roleNames = { "Admin", "Gast" };
         foreach (var roleName in roleNames)
         {

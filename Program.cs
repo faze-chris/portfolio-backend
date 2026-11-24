@@ -27,7 +27,7 @@ if (app.Environment.IsDevelopment())
 await DbInitializer.SeedAsync(app.Services);
 
 app.UseHttpsRedirection();
-
+// belangrijk voor de authenticatie en autorisatie van de API endpoints
 app.UseAuthentication();
 app.UseAuthorization();
 
