@@ -7,7 +7,7 @@ public static class ProjectEndpoints
         // map group for projects with path /api/projects
         var group = app.MapGroup("/api/projects").WithTags("Projects");
 
-        // CREATE / POST 
+        // CREATE / POST Beveiligd
         group.MapPost("/", (PortfolioDb db, [FromBody] CreateProjectRequest request) =>
         {
             var newProject = new Project
@@ -35,9 +35,11 @@ public static class ProjectEndpoints
             };
 
             return Results.Created($"/api/projects/{response.Id}", response);
-        }).WithName("CreateProject");
+        })
+        .WithName("CreateProject")
+        .RequireAuthorization("CanEdit");
 
-        // READ / GET 
+        // READ / GET open
         group.MapGet("/", (PortfolioDb db) =>
         {
             var projects = db.Projects.Select(p => new ProjectResponse
@@ -54,7 +56,7 @@ public static class ProjectEndpoints
             return Results.Ok(projects);
         }).WithName("GetProjects");
 
-        // UPDATE / PUT 
+        // UPDATE / PUT Beveiligd
         group.MapPut("/{id}", (PortfolioDb db, int id, [FromBody] CreateProjectRequest request) =>
         {
             var project = db.Projects.Find(id);
@@ -69,9 +71,11 @@ public static class ProjectEndpoints
 
             db.SaveChanges();
             return Results.NoContent();
-        }).WithName("UpdateProject");
+        })
+        .WithName("UpdateProject")
+        .RequireAuthorization("CanEdit");
 
-        // DELETE 
+        // DELETE Beveiligd
         group.MapDelete("/{id}", (PortfolioDb db, int id) =>
         {
             var project = db.Projects.Find(id);
@@ -80,6 +84,8 @@ public static class ProjectEndpoints
             db.Projects.Remove(project);
             db.SaveChanges();
             return Results.NoContent();
-        }).WithName("DeleteProject");
+        })
+        .WithName("DeleteProject")
+        .RequireAuthorization("CanEdit");
     }
 }
